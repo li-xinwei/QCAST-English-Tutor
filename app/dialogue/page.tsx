@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { marked } from 'marked';
@@ -17,7 +17,8 @@ interface ChatSession {
   lastMessage: Date;
 }
 
-export default function DialoguePage() {
+// Create a client component that uses useSearchParams
+function DialogueContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -317,5 +318,30 @@ Let's dive in with energy and purpose...`;
         </div>
       </div>
     </div>
+  );
+}
+
+// Create a loading fallback component
+function DialogueLoading() {
+  return (
+    <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex flex-col items-center space-y-4">
+        <div className="flex space-x-2">
+          <div className="w-4 h-4 rounded-full bg-blue-500 animate-bounce"></div>
+          <div className="w-4 h-4 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+          <div className="w-4 h-4 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+        </div>
+        <p className="text-gray-600 dark:text-gray-300">Loading conversation...</p>
+      </div>
+    </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function DialoguePage() {
+  return (
+    <Suspense fallback={<DialogueLoading />}>
+      <DialogueContent />
+    </Suspense>
   );
 }
