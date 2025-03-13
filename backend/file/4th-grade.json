@@ -1,0 +1,29 @@
+{
+  "grade": "4th-grade",
+  "units": [
+    {
+      "unit": 1,
+      "title": "Adventure Stories",
+      "vocabulary": ["journey", "discover", "explore", "mystery", "solve", "adventure"],
+      "phrases": ["Once upon a time...", "Suddenly...", "In the end..."],
+      "grammar": ["Past simple tense", "Sequence words", "Adjectives and adverbs"],
+      "exercises": [
+        "Write a short story",
+        "Put events in order",
+        "Describe characters"
+      ]
+    },
+    {
+      "unit": 2,
+      "title": "Science and Technology",
+      "vocabulary": ["computer", "experiment", "research", "invention", "scientist", "robot"],
+      "phrases": ["How does it work?", "What will happen if...?", "I predict that..."],
+      "grammar": ["Future with 'will'", "Conditional sentences", "Passive voice"],
+      "exercises": [
+        "Explain how something works",
+        "Make predictions",
+        "Write a science report"
+      ]
+    }
+  ]
+} 

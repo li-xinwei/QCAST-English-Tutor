@@ -1,0 +1,29 @@
+{
+  "grade": "1st-grade",
+  "units": [
+    {
+      "unit": 1,
+      "title": "Alphabet and Basic Sounds",
+      "vocabulary": ["cat", "dog", "hat", "pen", "book"],
+      "phrases": ["This is a...", "I see a...", "What is this?"],
+      "grammar": ["Articles: a, an, the", "Simple present: to be (am, is, are)"],
+      "exercises": [
+        "Match the letter with its sound",
+        "Circle the correct article",
+        "Complete the sentence with 'is' or 'are'"
+      ]
+    },
+    {
+      "unit": 2,
+      "title": "Colors and Numbers",
+      "vocabulary": ["red", "blue", "green", "one", "two", "three"],
+      "phrases": ["I like...", "What color is it?", "How many?"],
+      "grammar": ["Simple present: like", "Question words: what, how"],
+      "exercises": [
+        "Color the objects",
+        "Count and write the number",
+        "Match colors with objects"
+      ]
+    }
+  ]
+} 

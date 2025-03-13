@@ -1,0 +1,29 @@
+{
+  "grade": "5th-grade",
+  "units": [
+    {
+      "unit": 1,
+      "title": "Literature and Poetry",
+      "vocabulary": ["metaphor", "simile", "rhythm", "verse", "stanza", "theme"],
+      "phrases": ["The author suggests...", "This symbolizes...", "The main idea is..."],
+      "grammar": ["Perfect tenses", "Literary devices", "Reported speech"],
+      "exercises": [
+        "Analyze a poem",
+        "Write creative metaphors",
+        "Identify literary devices"
+      ]
+    },
+    {
+      "unit": 2,
+      "title": "Environment and Conservation",
+      "vocabulary": ["pollution", "recycling", "ecosystem", "climate", "endangered", "sustainable"],
+      "phrases": ["We should...", "If we don't...", "It's important to..."],
+      "grammar": ["Modal verbs", "Second conditional", "Cause and effect"],
+      "exercises": [
+        "Write a persuasive essay",
+        "Create an action plan",
+        "Research environmental issues"
+      ]
+    }
+  ]
+} 

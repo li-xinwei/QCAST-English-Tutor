@@ -1,0 +1,29 @@
+{
+  "grade": "2nd-grade",
+  "units": [
+    {
+      "unit": 1,
+      "title": "Family and Friends",
+      "vocabulary": ["mother", "father", "sister", "brother", "friend", "teacher"],
+      "phrases": ["This is my...", "Who is she/he?", "I have a..."],
+      "grammar": ["Possessive adjectives: my, your, his, her", "Present simple with have/has"],
+      "exercises": [
+        "Draw your family tree",
+        "Fill in the blanks with has/have",
+        "Write about your best friend"
+      ]
+    },
+    {
+      "unit": 2,
+      "title": "Daily Activities",
+      "vocabulary": ["wake up", "eat breakfast", "go to school", "play", "sleep"],
+      "phrases": ["I wake up at...", "What time do you...?", "Every day I..."],
+      "grammar": ["Simple present tense", "Time expressions", "Adverbs of frequency"],
+      "exercises": [
+        "Order daily activities",
+        "Write the time",
+        "Make your daily schedule"
+      ]
+    }
+  ]
+} 

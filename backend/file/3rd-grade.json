@@ -1,0 +1,29 @@
+{
+  "grade": "3rd-grade",
+  "units": [
+    {
+      "unit": 1,
+      "title": "Around the World",
+      "vocabulary": ["country", "city", "language", "culture", "travel", "map"],
+      "phrases": ["Where are you from?", "I live in...", "Can you speak...?"],
+      "grammar": ["Present continuous tense", "Prepositions of place", "Question words: where, which"],
+      "exercises": [
+        "Label countries on a map",
+        "Write about your city",
+        "Compare different cultures"
+      ]
+    },
+    {
+      "unit": 2,
+      "title": "Animals and Habitats",
+      "vocabulary": ["jungle", "desert", "ocean", "lion", "penguin", "whale"],
+      "phrases": ["It lives in...", "What does it eat?", "Can it...?"],
+      "grammar": ["Can/Cannot", "Present simple for facts", "Adjectives"],
+      "exercises": [
+        "Match animals with habitats",
+        "Describe an animal",
+        "Write animal facts"
+      ]
+    }
+  ]
+} 

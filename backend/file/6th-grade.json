@@ -1,0 +1,29 @@
+{
+  "grade": "6th-grade",
+  "units": [
+    {
+      "unit": 1,
+      "title": "Media and Communication",
+      "vocabulary": ["journalism", "broadcast", "social media", "interview", "article", "editorial"],
+      "phrases": ["According to...", "Studies show...", "Research indicates..."],
+      "grammar": ["Active vs Passive voice", "Formal vs Informal language", "Complex sentences"],
+      "exercises": [
+        "Write a news article",
+        "Conduct an interview",
+        "Analyze media bias"
+      ]
+    },
+    {
+      "unit": 2,
+      "title": "Global Issues",
+      "vocabulary": ["democracy", "economy", "immigration", "diversity", "equality", "human rights"],
+      "phrases": ["In my opinion...", "Research shows...", "This demonstrates..."],
+      "grammar": ["Third conditional", "Advanced modals", "Academic writing style"],
+      "exercises": [
+        "Write a research paper",
+        "Debate global issues",
+        "Present solutions"
+      ]
+    }
+  ]
+} 

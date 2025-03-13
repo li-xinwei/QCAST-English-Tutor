@@ -32,7 +32,25 @@ model = 'gpt'  # Default model is GPT
 client = OpenAI()
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS to allow requests from your frontend
+# Configure CORS to allow requests from the frontend
+CORS(app, resources={
+    r"/*": {  # Allow all routes
+        "origins": ["http://localhost:3000"],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
+
+# Ensure all responses have CORS headers
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
+
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
@@ -219,9 +237,38 @@ def process_dialogue():
         selected_model = data.get('model', 'gpt')
         user_message = data.get('text', '').strip()
         style = data.get('style', teaching_style)
+        grade = data.get('grade')  # Get grade from request
         
-        # Initialize messages with system message if this is a new conversation
-        if not messages_history or current_history_id is None:
+        print(f"Received request - Grade: {grade}, Style: {style}, Model: {selected_model}")
+        
+        # Check if grade has changed
+        grade_changed = grade and grade != current_textbook
+        if grade_changed:
+            print(f"Grade changed from {current_textbook} to {grade}")
+            current_textbook = grade
+            
+            # Save current conversation if it exists
+            if current_history_id and messages_history:
+                current_history = History.query.get(current_history_id)
+                if current_history:
+                    # Save as completed conversation if it has chat messages
+                    chat_messages = [msg for msg in messages_history if msg.get('role') != 'system']
+                    if chat_messages:
+                        save_conversation(messages_history, is_current=False)
+                    # Delete current session
+                    db.session.delete(current_history)
+                    db.session.commit()
+            
+            # Initialize new conversation with new grade
+            print(f"Initializing new conversation with grade {current_textbook}")
+            tutor = Tutor(grade=current_textbook, style=style)
+            system_message = {'role': 'system', 'content': tutor.load_tutor()}
+            messages_history = [system_message]
+            current_history_id = save_conversation(messages_history, is_current=True)
+        
+        # Initialize messages if this is a new conversation
+        elif not messages_history or current_history_id is None:
+            print(f"Initializing new conversation with grade {current_textbook}")
             tutor = Tutor(grade=current_textbook, style=style)
             system_message = {'role': 'system', 'content': tutor.load_tutor()}
             messages_history = [system_message]
@@ -229,6 +276,7 @@ def process_dialogue():
         
         # Process user message
         if user_message:
+            print(f"Processing user message: {user_message[:50]}...")
             # Add user message
             user_message_obj = {'role': 'user', 'content': user_message}
             messages_history.append(user_message_obj)
@@ -239,7 +287,7 @@ def process_dialogue():
                 assistant_message = {'role': 'assistant', 'content': response_text}
                 messages_history.append(assistant_message)
                 
-                # Update or create current session
+                # Update current session
                 if current_history_id:
                     current_history = History.query.get(current_history_id)
                     if current_history:
@@ -419,6 +467,58 @@ def load_conversation(history_id):
     except Exception as e:
         print(f"Error loading conversation: {str(e)}")
         return None
+
+@app.route('/api/history/clear', methods=['POST'])
+def clear_history():
+    try:
+        # Delete all history records
+        History.query.delete()
+        # Reset global state
+        global messages_history, current_history_id
+        messages_history = []
+        current_history_id = None
+        # Commit the changes
+        db.session.commit()
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        print(f"Error clearing history: {str(e)}")
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/textbook/upload', methods=['POST'])
+def upload_textbook():
+    try:
+        data = request.json
+        content = data.get('content')
+        grade = data.get('grade')
+        
+        if not content or not grade:
+            return jsonify({'error': 'Missing content or grade'}), 400
+            
+        # Save the textbook content to a file
+        with open(f'./file/{grade}.txt', 'w', encoding='utf-8') as f:
+            f.write(content)
+            
+        # Update global state
+        global current_textbook
+        current_textbook = grade
+        
+        return jsonify({'status': 'success'})
+        
+    except Exception as e:
+        print(f"Error uploading textbook: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# Error handler for all exceptions
+@app.errorhandler(Exception)
+def handle_error(error):
+    print(f"Error: {str(error)}")
+    response = jsonify({
+        "error": str(error),
+        "message": "An error occurred while processing your request"
+    })
+    response.status_code = 500
+    return response
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

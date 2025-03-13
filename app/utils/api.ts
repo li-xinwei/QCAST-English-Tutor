@@ -30,7 +30,8 @@ export interface ConversationResponse {
 export async function sendDialogue(
   text: string, 
   model: 'gpt' | 'qwen' = 'gpt',
-  style: 'humorous' | 'passionate' | 'creative' = 'humorous'
+  style: 'humorous' | 'passionate' | 'creative' = 'humorous',
+  grade: string = '3rd-grade'
 ): Promise<DialogueResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/dialogue`, {
@@ -38,7 +39,7 @@ export async function sendDialogue(
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text, model, style }),
+      body: JSON.stringify({ text, model, style, grade }),
     });
 
     if (!response.ok) {
@@ -99,6 +100,47 @@ export async function resetConversation(
     return response.json();
   } catch (error) {
     console.error('Error resetting conversation:', error);
+    throw error;
+  }
+}
+
+export async function clearHistory(): Promise<{ status: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/history/clear`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error clearing history:', error);
+    throw error;
+  }
+}
+
+export async function uploadTextbook(content: string, grade: string): Promise<{ status: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/textbook/upload`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ content, grade }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error uploading textbook:', error);
     throw error;
   }
 } 

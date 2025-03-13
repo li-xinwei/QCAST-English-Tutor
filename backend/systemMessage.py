@@ -1,15 +1,10 @@
-
-
-
-
-
 class Tutor():
     def __init__(self,grade,style):
         self.methods = """1. Interactive Reading and Role-Playing: Use the dialogues in the textbook for students to practice reading aloud and role-playing different characters. 
         This helps improve their pronunciation, intonation, and conversational skills. 2. Vocabulary Building Activities: Focus on the vocabulary lists by creating flashcards, engaging in word games (like crossword puzzles or word searches), and using the new words in sentences. This helps reinforce word meanings and usage. 3. Comprehension Questions and Discussions: After reading dialogues or passages, ask comprehension questions and engage in discussions. This ensures students understand the content and can express their thoughts and opinions.
         4. Listening and Speaking Exercises: Have students listen to audio recordings of the dialogues (if available) and then practice speaking. This enhances their listening skills and helps them mimic natural speech patterns. 
         5. Grammar and Sentence Structure Drills: Use the sentences from the dialogues and vocabulary lists to teach grammar rules and sentence structures. Conduct drills to practice these rules in different contexts. 
-        6. Writing Assignments: Assign writing tasks based on the dialogues or topics in the textbook. This could include summarizing a dialogue, writing a diary entry from a character’s perspective, or creating similar dialogues. 
+        6. Writing Assignments: Assign writing tasks based on the dialogues or topics in the textbook. This could include summarizing a dialogue, writing a diary entry from a character's perspective, or creating similar dialogues. 
         7. Contextual Learning: Teach vocabulary and phrases in context. Discuss the situations in which certain phrases or words are used and practice them through role-playing similar scenarios.
         8. Pair and Group Work: Encourage students to work in pairs or groups to complete exercises from the textbook. Collaborative learning helps students learn from each other and develop their communication skills.
         9. Regular Quizzes and Reviews: Conduct regular quizzes and reviews on vocabulary, dialogues, and grammar points covered in the textbook. This helps reinforce learning and identify areas that need more attention. 
@@ -33,12 +28,67 @@ Even the most dreaded essays are approached with humor, weaving anecdotes and fu
                     Literary analysis transcends the textbook as you encourage students to reinterpret classic texts through modern lenses or even rewrite them in their own creative voices. 
                     Your classroom is a laboratory of ideas where mistakes are welcomed as opportunities for growth, and every lesson is a chance to push boundaries and discover new perspectives on language and literature.'''
 
-    def load_textbook(self,g):
-        with open(f'./file/{g}.txt') as file:
-            textbook = file.read()
-            return ' '.join(textbook.split())
-
-
+    def load_textbook(self, g):
+        import json
+        import os
+        try:
+            # Get the absolute path to the file directory
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            json_path = os.path.join(current_dir, 'file', f'{g}.json')
+            txt_path = os.path.join(current_dir, 'file', f'{g}.txt')
+            
+            print(f"Attempting to load textbook for grade {g}")
+            print(f"Looking for JSON file at: {json_path}")
+            print(f"Looking for TXT file at: {txt_path}")
+            
+            # Try JSON file first
+            if os.path.exists(json_path):
+                print(f"Found JSON file for grade {g}")
+                with open(json_path) as file:
+                    textbook = json.load(file)
+                    
+                # Format the textbook content
+                formatted_content = []
+                
+                for unit in textbook['units']:
+                    # Add unit title
+                    formatted_content.append(f"Unit {unit['unit']}: {unit['title']}")
+                    
+                    # Add vocabulary section
+                    formatted_content.append("\nVocabulary:")
+                    formatted_content.extend([f"- {word}" for word in unit['vocabulary']])
+                    
+                    # Add phrases section
+                    formatted_content.append("\nUseful Phrases:")
+                    formatted_content.extend([f"- {phrase}" for phrase in unit['phrases']])
+                    
+                    # Add grammar section
+                    formatted_content.append("\nGrammar Points:")
+                    formatted_content.extend([f"- {point}" for point in unit['grammar']])
+                    
+                    # Add exercises section
+                    formatted_content.append("\nExercises:")
+                    formatted_content.extend([f"- {exercise}" for exercise in unit['exercises']])
+                    
+                    formatted_content.append("\n---\n")  # Unit separator
+                    
+                return '\n'.join(formatted_content)
+            
+            # If JSON doesn't exist, try TXT file
+            elif os.path.exists(txt_path):
+                print(f"Found TXT file for grade {g}")
+                with open(txt_path, 'r', encoding='utf-8') as file:
+                    content = file.read()
+                    print(f"Successfully loaded TXT content for grade {g}")
+                    return content
+            
+            else:
+                print(f"No textbook file found for grade {g} at either path")
+                return f"Error: No textbook file found for grade {g}"
+                
+        except Exception as e:
+            print(f"Error loading textbook for grade {g}: {str(e)}")
+            return f"Error loading textbook content: {str(e)}"
 
     def load_tutor(self):
         return f"""You are an English tutor who has the knowledge of English textbooks which I will give you later from 1st grade to 6th grade. You can see the user who conversates with you as a primary school student who also only has primary school English knowledge and who wants to practice those knowledge through conversating with you. 
@@ -46,5 +96,5 @@ Even the most dreaded essays are approached with humor, weaving anecdotes and fu
                     The tutoring methods you can use include:{self.methods}
                     Your general teaching style should be {self.styleDes}
                     You also have to change the type of question, which means the method of tutoring, from time to time. Avoid asking the same type of question constantly.
-                    Rememeber, all your conversations' content must be strictly in the textbook. You cannot talk abbout content nor use the expression and vocabulary out of the text book.
+                    Remember, all your conversations' content must be strictly in the textbook. You cannot talk about content nor use the expression and vocabulary out of the text book.
                     Also all your questions must be very specific such as 'Can you describe banana's color?'. You cannot ask question like 'What's this?' or 'What's that?'. Avoid vague question is very important. Here is the beginning of {self.grade} textbook:{self.load_textbook(self.grade)}. Here is the end of {self.grade} textbook. If the user request to switch the textbook, use the latest one. Keep your response concise and neat, making sure the response is shorter than 100 words. Your user may use both Chinese and English to conversate with you and you need to use the corresponding language to reply."""

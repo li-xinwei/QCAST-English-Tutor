@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { marked } from 'marked';
-import { sendDialogue, resetConversation, getHistory, getConversation, HistoryEntry } from '../utils/api';
+import { sendDialogue, resetConversation, getHistory, getConversation, HistoryEntry, clearHistory } from '../utils/api';
 
 interface Message {
   id: string;
@@ -23,14 +23,16 @@ export default function DialogueClient() {
   const searchParams = useSearchParams();
   
   const initialMessage = searchParams.get('message') || '';
-  const tutorStyle = 'humorous';  // Always default to humorous
-  const aiModel = 'gpt4';         // Always default to gpt4
+  const tutorStyle = searchParams.get('style') || 'humorous';
+  const aiModel = searchParams.get('model') || 'GPT-4';
+  const initialGrade = searchParams.get('grade') || '3rd-grade';
   
   // Store config in refs to avoid re-renders
   const configRef = useRef({
     initialMessage,
     tutorStyle,
-    aiModel
+    aiModel,
+    grade: initialGrade
   });
   
   const [messages, setMessages] = useState<Message[]>([]);
@@ -133,8 +135,9 @@ export default function DialogueClient() {
     try {
       const response = await sendDialogue(
         userMessage, 
-        model === 'gpt4' ? 'gpt' : 'qwen',
-        style as 'humorous' | 'passionate' | 'creative'
+        model === 'Qwen-2.5' ? 'qwen' : 'gpt',
+        style as 'humorous' | 'passionate' | 'creative',
+        configRef.current.grade
       );
       
       const aiMessage: Message = {
@@ -189,16 +192,68 @@ export default function DialogueClient() {
     const file = e.target.files?.[0];
     if (!file || isViewingHistory) return;
     
-    const userMessage: Message = {
-      id: generateMessageId(),
-      role: 'user',
-      content: `[Uploaded file: ${file.name}]`,
-      timestamp: new Date()
+    // Check if it's a text file
+    if (file.type !== 'text/plain') {
+      const errorMessage: Message = {
+        id: generateMessageId(),
+        role: 'assistant',
+        content: 'Please upload a text file (.txt) containing the textbook content.',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      return;
+    }
+
+    // Read the file content
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const content = event.target?.result as string;
+      
+      const userMessage: Message = {
+        id: generateMessageId(),
+        role: 'user',
+        content: `[Uploaded textbook: ${file.name}]`,
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, userMessage]);
+      setCurrentSessionMessages(prev => [...prev, userMessage]);
+
+      // Reset conversation with new textbook content
+      try {
+        await resetConversation(
+          configRef.current.tutorStyle as 'humorous' | 'passionate' | 'creative',
+          configRef.current.grade,
+          currentSessionMessages.map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }))
+        );
+
+        const systemMessage = `New textbook content has been loaded. I'll now use this content for our conversation.`;
+        const aiMessage: Message = {
+          id: generateMessageId(),
+          role: 'assistant',
+          content: systemMessage,
+          timestamp: new Date()
+        };
+        
+        setMessages(prev => [...prev, aiMessage]);
+        setCurrentSessionMessages(prev => [...prev, aiMessage]);
+      } catch (error) {
+        console.error('Error updating textbook:', error);
+        const errorMessage: Message = {
+          id: generateMessageId(),
+          role: 'assistant',
+          content: 'Sorry, I encountered an error while updating the textbook. Please try again.',
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessage]);
+        setCurrentSessionMessages(prev => [...prev, errorMessage]);
+      }
     };
-    
-    setMessages(prev => [...prev, userMessage]);
-    setCurrentSessionMessages(prev => [...prev, userMessage]);
-    simulateResponse(`I've uploaded a file called ${file.name}`, configRef.current.tutorStyle, configRef.current.aiModel);
+
+    reader.readAsText(file);
   };
   
   const goToHome = () => {
@@ -212,7 +267,7 @@ export default function DialogueClient() {
         // Save current session by resetting conversation (which will save it)
         await resetConversation(
           configRef.current.tutorStyle as 'humorous' | 'passionate' | 'creative',
-          '3rd-grade',
+          configRef.current.grade,
           currentSessionMessages.map(msg => ({
             role: msg.role,
             content: msg.content
@@ -222,7 +277,8 @@ export default function DialogueClient() {
       
       // Start a new conversation
       await resetConversation(
-        configRef.current.tutorStyle as 'humorous' | 'passionate' | 'creative'
+        configRef.current.tutorStyle as 'humorous' | 'passionate' | 'creative',
+        configRef.current.grade
       );
       
       // Clear local messages
@@ -240,6 +296,23 @@ export default function DialogueClient() {
       goToHome();
     } catch (error) {
       console.error('Error starting new chat:', error);
+    }
+  };
+  
+  const handleClearHistory = async () => {
+    try {
+      await clearHistory();
+      // Clear local states
+      setMessages([]);
+      setCurrentSessionMessages([]);
+      setChatSessions([]);
+      setIsViewingHistory(false);
+      // Reset the initial message flag
+      initialMessageProcessedRef.current = false;
+      // Initialize a new conversation
+      await resetConversation(configRef.current.tutorStyle as 'humorous' | 'passionate' | 'creative');
+    } catch (error) {
+      console.error('Error clearing history:', error);
     }
   };
   
@@ -301,7 +374,7 @@ export default function DialogueClient() {
         {/* Fixed New Chat button */}
         <div className="flex-shrink-0 p-4 border-b border-gray-200 dark:border-gray-700">
           <button 
-            className="w-full flex items-center justify-center gap-2 p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium"
+            className="w-full flex items-center justify-center gap-2 p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium mb-2"
             onClick={handleNewChat}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -309,6 +382,18 @@ export default function DialogueClient() {
               <polyline points="19 12 12 19 5 12"></polyline>
             </svg>
             New Chat
+          </button>
+          
+          <button 
+            className="w-full flex items-center justify-center gap-2 p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium"
+            onClick={handleClearHistory}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+            </svg>
+            Clear History
           </button>
         </div>
         
@@ -352,6 +437,9 @@ export default function DialogueClient() {
             </span>
             <span className="px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 font-medium">
               {configRef.current.aiModel}
+            </span>
+            <span className="px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 font-medium">
+              {configRef.current.grade.split('-')[0].charAt(0).toUpperCase() + configRef.current.grade.split('-')[0].slice(1)}
             </span>
           </div>
         </div>

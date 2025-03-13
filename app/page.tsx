@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
-  const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
-  const [selectedModel, setSelectedModel] = useState<string | null>(null);
+  const [selectedStyle, setSelectedStyle] = useState<string>('humorous');
+  const [selectedModel, setSelectedModel] = useState<string>('GPT-4');
+  const [selectedGrade, setSelectedGrade] = useState<string>('3rd-grade');
   const [userQuery, setUserQuery] = useState("");
   
   const handleStartChat = () => {
-    if (userQuery.trim() && selectedStyle && selectedModel) {
-      router.push(`/dialogue?message=${encodeURIComponent(userQuery)}&style=${selectedStyle}&model=${selectedModel}`);
+    if (userQuery.trim()) {
+      router.push(`/dialogue?message=${encodeURIComponent(userQuery)}&style=${selectedStyle}&model=${selectedModel}&grade=${selectedGrade}`);
     }
   };
   
@@ -55,9 +56,9 @@ export default function Home() {
           </div>
         </div>
         
-        {/* Tutor style selection */}
+        {/* Style selection */}
         <div className="w-full">
-          <h2 className="text-xl font-semibold mb-3">Choose your tutor style:</h2>
+          <h2 className="text-xl font-semibold mb-3">Choose your teaching style:</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <button 
               className={`p-4 rounded-lg border transition-colors ${
@@ -68,19 +69,7 @@ export default function Home() {
               onClick={() => setSelectedStyle('humorous')}
             >
               <h3 className="font-bold">Humorous</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Learn with jokes and fun examples</p>
-            </button>
-            
-            <button 
-              className={`p-4 rounded-lg border transition-colors ${
-                selectedStyle === 'creative' 
-                  ? 'bg-purple-100 dark:bg-purple-900 border-purple-500' 
-                  : 'border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
-              onClick={() => setSelectedStyle('creative')}
-            >
-              <h3 className="font-bold">Creative</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Imaginative scenarios and storytelling</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Fun and engaging teaching style</p>
             </button>
             
             <button 
@@ -94,6 +83,18 @@ export default function Home() {
               <h3 className="font-bold">Passionate</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">Enthusiastic and motivating approach</p>
             </button>
+            
+            <button 
+              className={`p-4 rounded-lg border transition-colors ${
+                selectedStyle === 'creative' 
+                  ? 'bg-purple-100 dark:bg-purple-900 border-purple-500' 
+                  : 'border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800'
+              }`}
+              onClick={() => setSelectedStyle('creative')}
+            >
+              <h3 className="font-bold">Creative</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Innovative and experimental methods</p>
+            </button>
           </div>
         </div>
         
@@ -103,11 +104,11 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <button 
               className={`p-4 rounded-lg border transition-colors ${
-                selectedModel === 'gpt4' 
+                selectedModel === 'GPT-4' 
                   ? 'bg-green-100 dark:bg-green-900 border-green-500' 
                   : 'border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
-              onClick={() => setSelectedModel('gpt4')}
+              onClick={() => setSelectedModel('GPT-4')}
             >
               <h3 className="font-bold">GPT-4</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">Advanced language capabilities</p>
@@ -115,21 +116,41 @@ export default function Home() {
             
             <button 
               className={`p-4 rounded-lg border transition-colors ${
-                selectedModel === 'qwen25' 
+                selectedModel === 'Qwen-2.5' 
                   ? 'bg-yellow-100 dark:bg-yellow-900 border-yellow-500' 
                   : 'border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
-              onClick={() => setSelectedModel('qwen25')}
+              onClick={() => setSelectedModel('Qwen-2.5')}
             >
               <h3 className="font-bold">Qwen-2.5</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">Specialized language learning focus</p>
             </button>
           </div>
         </div>
+
+        {/* Grade selection */}
+        <div className="w-full">
+          <h2 className="text-xl font-semibold mb-3">Choose your textbook grade:</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+            {['1st-grade', '2nd-grade', '3rd-grade', '4th-grade', '5th-grade', '6th-grade'].map((grade) => (
+              <button 
+                key={grade}
+                className={`p-4 rounded-lg border transition-colors ${
+                  selectedGrade === grade 
+                    ? 'bg-indigo-100 dark:bg-indigo-900 border-indigo-500' 
+                    : 'border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+                onClick={() => setSelectedGrade(grade)}
+              >
+                <h3 className="font-bold">{grade.split('-')[0].charAt(0).toUpperCase() + grade.split('-')[0].slice(1)}</h3>
+              </button>
+            ))}
+          </div>
+        </div>
       </main>
       
       <footer className="w-full max-w-3xl text-center text-sm text-gray-500">
-        <p className="mb-1">QCAST ESL - Powered by AI language models to help you learn English effectively</p>
+        <p className="mb-1">QCAST ESL English Tutor - Powered by AI language models to help you learn English effectively</p>
         <p>Created by Xinwei Li</p>
       </footer>
     </div>
