@@ -46,10 +46,13 @@ db.init_app(app)
 # Configure CORS
 CORS(app, resources={
     r"/*": {
-        "origins": ALLOWED_ORIGINS,
+        "origins": [origin.strip() for origin in ALLOWED_ORIGINS],  # Clean any whitespace
         "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"],
-        "supports_credentials": True
+        "allow_headers": ["Content-Type"],
+        "supports_credentials": True,
+        "expose_headers": ["Content-Type"],
+        "max_age": 600,
+        "send_wildcard": False
     }
 })
 
@@ -171,7 +174,26 @@ def genRes(message, model):
 
 @app.route('/')
 def welcome():
-    return render_template('index.html',teaching_style=teaching_style)
+    try:
+        # Print debug information
+        print("Debug Info:")
+        print(f"ALLOWED_ORIGINS: {ALLOWED_ORIGINS}")
+        print(f"OpenAI Client Status: {'Initialized' if client else 'Not Initialized'}")
+        print(f"Current Working Directory: {os.getcwd()}")
+        print(f"Database URL: {app.config['SQLALCHEMY_DATABASE_URI']}")
+        
+        return jsonify({
+            "status": "ok",
+            "message": "QCAST ESL Tutor API is running",
+            "config": {
+                "teaching_style": teaching_style,
+                "current_textbook": current_textbook,
+                "model": model
+            }
+        })
+    except Exception as e:
+        print(f"Error in welcome route: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 # Legacy routes - disabled
 # @app.route('/dialogue', methods=['POST'])
@@ -232,13 +254,13 @@ def welcome():
 #         db.session.commit()
 #     return render_template('dialogue.html', completions=[completion for completion in completions if completion['role']!='system'], histories=histories)
 
-@app.route('/save_record',methods=['POST'])
+@app.route('/save_record', methods=['POST'])
 def saveRecord():
-
-
-    completions.clear()
-
-    return redirect(url_for('welcome'))
+    try:
+        completions.clear()
+        return jsonify({"status": "success"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/display_history',methods=['POST'])
@@ -252,31 +274,41 @@ def displayHistory():
     history_viewing=history
     return render_template('dialogue.html',completions=[content for content in history.content if content['role']!='system'],histories=histories)
 
-@app.route('/style_selection',methods=['POST'])
+@app.route('/style_selection', methods=['POST'])
 def selectStyle():
-    global teaching_style
-    if 'humorous' in request.form:
-        add_message('system',Tutor(style='humorous',grade=current_textbook).load_tutor())
-        teaching_style="humorous"
-    elif 'passionate' in request.form:
-        add_message('system',Tutor(style='passionate',grade=current_textbook).load_tutor())
-        teaching_style="passionate"
-    else:
-        add_message('system',Tutor(style='creative',grade=current_textbook).load_tutor())
-        teaching_style="creative"
+    try:
+        global teaching_style
+        data = request.json
+        style = data.get('style', 'humorous')
+        
+        if style in ['humorous', 'passionate', 'creative']:
+            teaching_style = style
+            return jsonify({
+                "status": "success",
+                "teaching_style": teaching_style
+            })
+        else:
+            return jsonify({"error": "Invalid teaching style"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-
-    return render_template('index.html',teaching_style=teaching_style,model=model)
-
-@app.route('/model_selection',methods=['POST'])
+@app.route('/model_selection', methods=['POST'])
 def selectModel():
-    global model
-    if 'gpt' in request.form:
-        model='gpt'
-    elif 'qwen' in request.form:
-        model='qwen'
-    print(model)
-    return render_template('index.html', model=model,teaching_style=teaching_style)
+    try:
+        global model
+        data = request.json
+        selected_model = data.get('model', 'gpt')
+        
+        if selected_model in ['gpt', 'qwen']:
+            model = selected_model
+            return jsonify({
+                "status": "success",
+                "model": model
+            })
+        else:
+            return jsonify({"error": "Invalid model selection"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # API endpoint for dialogue processing
 @app.route('/api/dialogue', methods=['POST'])
@@ -564,12 +596,30 @@ def upload_textbook():
 @app.errorhandler(Exception)
 def handle_error(error):
     print(f"Error: {str(error)}")
+    # Create a clean error response without newlines
+    error_message = str(error).replace('\n', ' ').strip()
     response = jsonify({
-        "error": str(error),
+        "error": error_message,
         "message": "An error occurred while processing your request"
     })
     response.status_code = 500
+    # Ensure CORS headers are clean
+    response.headers['Access-Control-Allow-Origin'] = ALLOWED_ORIGINS[0].strip()
+    return response
+
+# Add 404 handler
+@app.errorhandler(404)
+def not_found_error(error):
+    response = jsonify({
+        "error": "Not Found",
+        "message": "The requested URL was not found on the server"
+    })
+    response.status_code = 404
+    # Ensure CORS headers are clean
+    response.headers['Access-Control-Allow-Origin'] = ALLOWED_ORIGINS[0].strip()
     return response
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    # Get port from environment variable or default to 5001
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port, debug=False)  # Disable debug mode in production
