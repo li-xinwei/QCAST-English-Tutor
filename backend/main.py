@@ -1,3 +1,4 @@
+import os
 import dashscope
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -12,7 +13,8 @@ from dashscope import Generation
 from openai import OpenAI
 from flask_cors import CORS
 
-
+# Get allowed origins from environment variable or use default
+ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
 
 class Base(DeclarativeBase):
     pass
@@ -25,7 +27,7 @@ teaching_style = 'humorous'     # Default style
 messages_history = []           # Store conversation history
 current_history_id = None       # Store the ID of the current conversation
 
-dashscope.api_key = 'sk-92606777cb7748e8916082663128fe09'
+dashscope.api_key = os.environ.get('DASHSCOPE_API_KEY', 'sk-92606777cb7748e8916082663128fe09')
 
 model = 'gpt'  # Default model is GPT
 
@@ -35,7 +37,7 @@ app = Flask(__name__)
 # Configure CORS to allow requests from the frontend
 CORS(app, resources={
     r"/*": {  # Allow all routes
-        "origins": ["http://localhost:3000"],
+        "origins": ALLOWED_ORIGINS,
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "supports_credentials": True
@@ -45,7 +47,11 @@ CORS(app, resources={
 # Ensure all responses have CORS headers
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    # Get origin from request
+    origin = request.headers.get('Origin')
+    # If origin is in allowed origins, set it in response
+    if origin in ALLOWED_ORIGINS:
+        response.headers.add('Access-Control-Allow-Origin', origin)
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     response.headers.add('Access-Control-Allow-Credentials', 'true')

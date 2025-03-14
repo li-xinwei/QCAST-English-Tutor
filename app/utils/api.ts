@@ -1,4 +1,5 @@
-export const API_BASE_URL = 'http://localhost:5001';
+// Get the API base URL from environment variables, fallback to localhost for development
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 
 export interface DialogueResponse {
   response: string;
