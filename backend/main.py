@@ -19,17 +19,51 @@ ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:3000').spl
 class Base(DeclarativeBase):
     pass
 
+app = Flask(__name__)
+
+# Configure database
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    # Handle Railway's postgres:// URLs
+    if DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+else:
+    # Fallback for local development
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///instance/project.db"
+    os.makedirs('instance', exist_ok=True)
+
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_pre_ping": True,  # Enable connection health checks
+    "pool_recycle": 300,    # Recycle connections every 5 minutes
+}
+
+# Initialize database
+db = SQLAlchemy(model_class=Base)
+db.init_app(app)
+
+# Configure CORS
+CORS(app, resources={
+    r"/*": {
+        "origins": ALLOWED_ORIGINS,
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
+
+# Initialize other global variables
 completions = []
+current_textbook = '3rd-grade'
+teaching_style = 'humorous'
+messages_history = []
+current_history_id = None
 
-# Global variables to store current state
-current_textbook = '3rd-grade'  # Default grade
-teaching_style = 'humorous'     # Default style
-messages_history = []           # Store conversation history
-current_history_id = None       # Store the ID of the current conversation
-
+# Initialize API clients
 dashscope.api_key = os.environ.get('DASHSCOPE_API_KEY', 'sk-92606777cb7748e8916082663128fe09')
 
-# Initialize OpenAI client with API key from environment
+# Initialize OpenAI client
 openai_api_key = os.environ.get('OPENAI_API_KEY')
 try:
     if not openai_api_key:
@@ -41,44 +75,9 @@ except Exception as e:
     print(f"Error initializing OpenAI client: {str(e)}")
     client = None
 
-model = 'gpt'  # Default model is GPT
+model = 'gpt'  # Default model
 
-app = Flask(__name__)
-
-# Configure database
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
-    DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
-
-app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL or "sqlite:///instance/project.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-# Configure CORS
-CORS(app, resources={
-    r"/*": {  # Allow all routes
-        "origins": ALLOWED_ORIGINS,
-        "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"],
-        "supports_credentials": True
-    }
-})
-
-# Ensure all responses have CORS headers
-@app.after_request
-def after_request(response):
-    # Get origin from request
-    origin = request.headers.get('Origin')
-    # If origin is in allowed origins, set it in response
-    if origin in ALLOWED_ORIGINS:
-        response.headers.add('Access-Control-Allow-Origin', origin)
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
-    return response
-
-db = SQLAlchemy(model_class=Base)
-db.init_app(app)
-
+# Define models
 class History(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     init = db.Column(db.String)
@@ -97,6 +96,14 @@ class History(db.Model):
         history.init = data.get('init')
         history.content = data.get('content', [])
         return history
+
+# Initialize database tables
+with app.app_context():
+    try:
+        db.create_all()
+        print("Database tables created successfully")
+    except Exception as e:
+        print(f"Error creating database tables: {str(e)}")
 
 history_viewing=History()
 with app.app_context():
