@@ -36,10 +36,7 @@ try:
         print("Warning: OPENAI_API_KEY not set. GPT-4 functionality will be disabled.")
         client = None
     else:
-        client = OpenAI(
-            api_key=openai_api_key,
-            base_url="https://api.openai.com/v1"  # Explicitly set the base URL
-        )
+        client = OpenAI(api_key=openai_api_key)
 except Exception as e:
     print(f"Error initializing OpenAI client: {str(e)}")
     client = None
@@ -47,7 +44,16 @@ except Exception as e:
 model = 'gpt'  # Default model is GPT
 
 app = Flask(__name__)
-# Configure CORS to allow requests from the frontend
+
+# Configure database
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
+    DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL or "sqlite:///instance/project.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Configure CORS
 CORS(app, resources={
     r"/*": {  # Allow all routes
         "origins": ALLOWED_ORIGINS,
@@ -70,7 +76,6 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
