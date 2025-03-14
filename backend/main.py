@@ -31,11 +31,18 @@ dashscope.api_key = os.environ.get('DASHSCOPE_API_KEY', 'sk-92606777cb7748e89160
 
 # Initialize OpenAI client with API key from environment
 openai_api_key = os.environ.get('OPENAI_API_KEY')
-if not openai_api_key:
-    print("Warning: OPENAI_API_KEY not set. GPT-4 functionality will be disabled.")
+try:
+    if not openai_api_key:
+        print("Warning: OPENAI_API_KEY not set. GPT-4 functionality will be disabled.")
+        client = None
+    else:
+        client = OpenAI(
+            api_key=openai_api_key,
+            base_url="https://api.openai.com/v1"  # Explicitly set the base URL
+        )
+except Exception as e:
+    print(f"Error initializing OpenAI client: {str(e)}")
     client = None
-else:
-    client = OpenAI(api_key=openai_api_key)
 
 model = 'gpt'  # Default model is GPT
 
@@ -113,18 +120,24 @@ def genRes(message, model):
                 
         elif model == 'gpt':
             if client is None:
-                return "GPT-4 is currently unavailable. Please set the OPENAI_API_KEY environment variable or try using Qwen model instead."
+                print("GPT-4 functionality is disabled. Falling back to Qwen.")
+                return genRes(message, 'qwen')
                 
-            response = client.chat.completions.create(
-                model='gpt-4',
-                messages=message
-            )
-            
-            if response and hasattr(response, 'choices') and len(response.choices) > 0:
-                return response.choices[0].message.content
-            else:
-                print("Error: Invalid response from OpenAI API")
-                return "I'm sorry, I couldn't process your request at the moment. Please try again later."
+            try:
+                response = client.chat.completions.create(
+                    model='gpt-4',
+                    messages=message
+                )
+                
+                if response and hasattr(response, 'choices') and len(response.choices) > 0:
+                    return response.choices[0].message.content
+                else:
+                    print("Error: Invalid response from OpenAI API")
+                    return "I'm sorry, I couldn't process your request at the moment. Please try again later."
+            except Exception as e:
+                print(f"Error with OpenAI API: {str(e)}")
+                print("Falling back to Qwen model")
+                return genRes(message, 'qwen')
     except Exception as e:
         print(f"Error in genRes: {str(e)}")
         return "I encountered an error while processing your request. Please try again later."
