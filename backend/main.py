@@ -70,7 +70,18 @@ try:
         print("Warning: OPENAI_API_KEY not set. GPT-4 functionality will be disabled.")
         client = None
     else:
-        client = OpenAI(api_key=openai_api_key)
+        # Initialize with minimal configuration
+        client = OpenAI(
+            api_key=openai_api_key,
+            timeout=60.0  # Set a reasonable timeout
+        )
+        # Test the client
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[{"role": "system", "content": "Test connection"}],
+            max_tokens=5
+        )
+        print("OpenAI client initialized successfully")
 except Exception as e:
     print(f"Error initializing OpenAI client: {str(e)}")
     client = None
