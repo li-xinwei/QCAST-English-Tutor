@@ -29,9 +29,15 @@ current_history_id = None       # Store the ID of the current conversation
 
 dashscope.api_key = os.environ.get('DASHSCOPE_API_KEY', 'sk-92606777cb7748e8916082663128fe09')
 
-model = 'gpt'  # Default model is GPT
+# Initialize OpenAI client with API key from environment
+openai_api_key = os.environ.get('OPENAI_API_KEY')
+if not openai_api_key:
+    print("Warning: OPENAI_API_KEY not set. GPT-4 functionality will be disabled.")
+    client = None
+else:
+    client = OpenAI(api_key=openai_api_key)
 
-client = OpenAI()
+model = 'gpt'  # Default model is GPT
 
 app = Flask(__name__)
 # Configure CORS to allow requests from the frontend
@@ -106,8 +112,11 @@ def genRes(message, model):
                 return "I'm sorry, I couldn't process your request at the moment. Please try again later."
                 
         elif model == 'gpt':
+            if client is None:
+                return "GPT-4 is currently unavailable. Please set the OPENAI_API_KEY environment variable or try using Qwen model instead."
+                
             response = client.chat.completions.create(
-                model='gpt-4o',
+                model='gpt-4',
                 messages=message
             )
             
