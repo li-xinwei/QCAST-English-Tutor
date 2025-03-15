@@ -191,7 +191,7 @@ export default function Home() {
                   type="file" 
                   className="hidden" 
                   onChange={handleFileUpload}
-                  accept=".txt,.json,.md"
+                  accept=".txt,.json,.md,.pdf"
                 />
                 <div className="flex flex-col items-center gap-1">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -205,7 +205,7 @@ export default function Home() {
                     </span>
                   ) : (
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Click to upload a file (.txt, .json, .md)
+                      Click to upload a file (.txt, .json, .md, .pdf)
                     </span>
                   )}
                 </div>
