@@ -17,7 +17,7 @@ export default function Home() {
   };
   
   return (
-    <div className="grid grid-rows-[auto_1fr_auto] items-center justify-items-center min-h-screen p-8 pb-20 gap-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="grid grid-rows-[auto_1fr_auto] items-center justify-items-center h-screen p-4 sm:p-12 font-[family-name:var(--font-geist-sans)]">
       <header className="w-full max-w-3xl text-center">
         <div className="flex items-center justify-center gap-3 mb-4">
           <Image 
@@ -32,7 +32,7 @@ export default function Home() {
         <p className="text-gray-600 dark:text-gray-300">Your AI companion for language learning</p>
       </header>
       
-      <main className="flex flex-col gap-8 w-full max-w-3xl">
+      <main className="flex flex-col gap-6 w-full max-w-3xl">
         {/* Chat input area */}
         <div className="w-full">
           <div className="relative">
