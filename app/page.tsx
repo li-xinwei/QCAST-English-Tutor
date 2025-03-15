@@ -289,7 +289,7 @@ export default function Home() {
       
       <footer className="w-full max-w-2xl text-center text-xs text-gray-500 mt-6">
         <p className="mb-1">QCAST ESL English Tutor - Powered by AI language models to help you learn English effectively</p>
-        <p>Created by Xinwei Li</p>
+        <p>Created and maintained by Xinwei Li</p>
       </footer>
     </div>
   );
