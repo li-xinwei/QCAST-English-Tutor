@@ -9,10 +9,39 @@ export default function Home() {
   const [selectedModel, setSelectedModel] = useState<string>('GPT-4');
   const [selectedGrade, setSelectedGrade] = useState<string>('3rd-grade');
   const [userQuery, setUserQuery] = useState("");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   
   const handleStartChat = () => {
-    if (userQuery.trim()) {
-      router.push(`/dialogue?message=${encodeURIComponent(userQuery)}&style=${selectedStyle}&model=${selectedModel}&grade=${selectedGrade}`);
+    if (userQuery.trim() || uploadedFile) {
+      const params = new URLSearchParams({
+        style: selectedStyle,
+        model: selectedModel,
+        grade: selectedGrade
+      });
+      
+      if (userQuery.trim()) {
+        params.append('message', userQuery);
+      }
+      
+      if (uploadedFile) {
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          const content = event.target?.result as string;
+          params.append('material', content);
+          params.append('materialName', uploadedFile.name);
+          router.push(`/dialogue?${params.toString()}`);
+        };
+        reader.readAsText(uploadedFile);
+      } else {
+        router.push(`/dialogue?${params.toString()}`);
+      }
+    }
+  };
+  
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadedFile(file);
     }
   };
   
@@ -53,6 +82,54 @@ export default function Home() {
                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
               </svg>
             </button>
+          </div>
+        </div>
+        
+        {/* File upload area */}
+        <div className="w-full">
+          <h2 className="text-xl font-semibold mb-3">Or upload your own material:</h2>
+          <div className="flex items-center gap-4">
+            <label className="flex-1 cursor-pointer">
+              <div className={`p-4 rounded-lg border-2 border-dashed transition-colors ${
+                uploadedFile 
+                  ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
+                  : 'border-gray-300 dark:border-gray-700 hover:border-blue-500'
+              }`}>
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  onChange={handleFileUpload}
+                  accept=".txt,.json,.md"
+                />
+                <div className="flex flex-col items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  {uploadedFile ? (
+                    <span className="text-sm text-green-600 dark:text-green-400">
+                      {uploadedFile.name}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      Click to upload a file (.txt, .json, .md)
+                    </span>
+                  )}
+                </div>
+              </div>
+            </label>
+            {uploadedFile && (
+              <button
+                className="p-2 text-red-500 hover:text-red-600"
+                onClick={() => setUploadedFile(null)}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            )}
           </div>
         </div>
         

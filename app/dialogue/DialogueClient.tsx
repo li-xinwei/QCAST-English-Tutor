@@ -26,13 +26,17 @@ export default function DialogueClient() {
   const tutorStyle = searchParams.get('style') || 'humorous';
   const aiModel = searchParams.get('model') || 'GPT-4';
   const initialGrade = searchParams.get('grade') || '3rd-grade';
+  const uploadedMaterial = searchParams.get('material') || '';
+  const materialName = searchParams.get('materialName') || '';
   
   // Store config in refs to avoid re-renders
   const configRef = useRef({
     initialMessage,
     tutorStyle,
     aiModel,
-    grade: initialGrade
+    grade: initialGrade,
+    uploadedMaterial,
+    materialName
   });
   
   const [messages, setMessages] = useState<Message[]>([]);
@@ -65,8 +69,26 @@ export default function DialogueClient() {
       // Load chat history first
       await loadChatHistory();
       
+      // If there's uploaded material, create it as the first message
+      if (configRef.current.uploadedMaterial) {
+        const userMessage: Message = {
+          id: generateMessageId(),
+          role: 'user',
+          content: `[Uploaded material: ${configRef.current.materialName}]\n\nPlease help me understand and learn from this material:\n\n${configRef.current.uploadedMaterial}`,
+          timestamp: new Date()
+        };
+        setMessages([userMessage]);
+        setCurrentSessionMessages([userMessage]);
+        
+        // Get AI response
+        await simulateResponse(
+          userMessage.content,
+          configRef.current.tutorStyle,
+          configRef.current.aiModel
+        );
+      }
       // If there's an initial message, create it as the first message
-      if (configRef.current.initialMessage) {
+      else if (configRef.current.initialMessage) {
         const userMessage: Message = {
           id: generateMessageId(),
           role: 'user',
