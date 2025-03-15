@@ -194,7 +194,7 @@ Let's dive in with energy and purpose...`;
                 <line x1="3" y1="18" x2="21" y2="18"></line>
               </svg>
             </button>
-            <h1 className="font-semibold">QCAST ESL Tutor</h1>
+            <h1 className="font-semibold">QCAST ESL English Tutor</h1>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <span className="px-2 py-1 rounded-full bg-gray-200 dark:bg-gray-800">
