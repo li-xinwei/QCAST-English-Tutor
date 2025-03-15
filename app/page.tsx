@@ -29,7 +29,7 @@ export default function Home() {
           />
           <h1 className="text-3xl font-bold">QCAST ESL English Tutor</h1>
         </div>
-        <p className="text-gray-600 dark:text-gray-300">Your AI companion for language learning</p>
+        <p className="text-gray-600 dark:text-gray-300">Your AI companion for English learning as ESL</p>
       </header>
       
       <main className="flex flex-col gap-6 w-full max-w-3xl">
@@ -130,7 +130,7 @@ export default function Home() {
 
         {/* Grade selection */}
         <div className="w-full">
-          <h2 className="text-xl font-semibold mb-3">Choose your textbook grade:</h2>
+          <h2 className="text-xl font-semibold mb-3">Choose your grade:</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
             {['1st-grade', '2nd-grade', '3rd-grade', '4th-grade', '5th-grade', '6th-grade'].map((grade) => (
               <button 
