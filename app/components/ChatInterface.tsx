@@ -109,22 +109,6 @@ Let's dive in with energy and purpose...`;
     simulateResponse(input, tutorStyle, aiModel);
   };
   
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    // Just simulate file upload for now
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: `[Uploaded file: ${file.name}]`,
-      timestamp: new Date()
-    };
-    
-    setMessages(prev => [...prev, userMessage]);
-    simulateResponse(`I've uploaded a file called ${file.name}`, tutorStyle, aiModel);
-  };
-  
   return (
     <div className="flex w-full h-screen max-h-screen">
       {/* Sidebar for chat history */}
@@ -250,19 +234,6 @@ Let's dive in with energy and purpose...`;
         {/* Input area */}
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex items-end gap-2">
-            <label className="cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-              <input 
-                type="file" 
-                className="hidden" 
-                onChange={handleFileUpload}
-              />
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-              </svg>
-            </label>
-            
             <div className="relative flex-1">
               <textarea
                 className="w-full p-3 pr-10 rounded-lg border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"

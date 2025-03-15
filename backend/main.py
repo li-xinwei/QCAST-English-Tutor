@@ -568,31 +568,6 @@ def clear_history():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/textbook/upload', methods=['POST'])
-def upload_textbook():
-    try:
-        data = request.json
-        content = data.get('content')
-        grade = data.get('grade')
-        
-        if not content or not grade:
-            return jsonify({'error': 'Missing content or grade'}), 400
-            
-        # Save the textbook content to a file
-        with open(f'./file/{grade}.txt', 'w', encoding='utf-8') as f:
-            f.write(content)
-            
-        # Update global state
-        global current_textbook
-        current_textbook = grade
-        
-        return jsonify({'status': 'success'})
-        
-    except Exception as e:
-        print(f"Error uploading textbook: {str(e)}")
-        return jsonify({'error': str(e)}), 500
-
-# Error handler for all exceptions
 @app.errorhandler(Exception)
 def handle_error(error):
     print(f"Error: {str(error)}")

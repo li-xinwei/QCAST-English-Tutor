@@ -123,25 +123,4 @@ export async function clearHistory(): Promise<{ status: string }> {
     console.error('Error clearing history:', error);
     throw error;
   }
-}
-
-export async function uploadTextbook(content: string, grade: string): Promise<{ status: string }> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/textbook/upload`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ content, grade }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Error uploading textbook:', error);
-    throw error;
-  }
 } 

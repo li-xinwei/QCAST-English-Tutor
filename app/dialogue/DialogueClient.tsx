@@ -188,74 +188,6 @@ export default function DialogueClient() {
     );
   };
   
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || isViewingHistory) return;
-    
-    // Check if it's a text file
-    if (file.type !== 'text/plain') {
-      const errorMessage: Message = {
-        id: generateMessageId(),
-        role: 'assistant',
-        content: 'Please upload a text file (.txt) containing the textbook content.',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-      return;
-    }
-
-    // Read the file content
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const content = event.target?.result as string;
-      
-      const userMessage: Message = {
-        id: generateMessageId(),
-        role: 'user',
-        content: `[Uploaded textbook: ${file.name}]`,
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, userMessage]);
-      setCurrentSessionMessages(prev => [...prev, userMessage]);
-
-      // Reset conversation with new textbook content
-      try {
-        await resetConversation(
-          configRef.current.tutorStyle as 'humorous' | 'passionate' | 'creative',
-          configRef.current.grade,
-          currentSessionMessages.map(msg => ({
-            role: msg.role,
-            content: msg.content
-          }))
-        );
-
-        const systemMessage = `New textbook content has been loaded. I'll now use this content for our conversation.`;
-        const aiMessage: Message = {
-          id: generateMessageId(),
-          role: 'assistant',
-          content: systemMessage,
-          timestamp: new Date()
-        };
-        
-        setMessages(prev => [...prev, aiMessage]);
-        setCurrentSessionMessages(prev => [...prev, aiMessage]);
-      } catch (error) {
-        console.error('Error updating textbook:', error);
-        const errorMessage: Message = {
-          id: generateMessageId(),
-          role: 'assistant',
-          content: 'Sorry, I encountered an error while updating the textbook. Please try again.',
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, errorMessage]);
-        setCurrentSessionMessages(prev => [...prev, errorMessage]);
-      }
-    };
-
-    reader.readAsText(file);
-  };
-  
   const goToHome = () => {
     router.push('/');
   };
@@ -495,23 +427,6 @@ export default function DialogueClient() {
             )}
             {!isViewingHistory && (
               <>
-                <button 
-                  className="h-10 w-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
-                >
-                  <label className="cursor-pointer flex items-center justify-center w-full h-full">
-                    <input 
-                      type="file" 
-                      className="hidden" 
-                      onChange={handleFileUpload}
-                    />
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="17 8 12 3 7 8"></polyline>
-                      <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
-                  </label>
-                </button>
-                
                 <div className="relative flex-1 flex items-center h-10">
                   <input
                     type="text"
