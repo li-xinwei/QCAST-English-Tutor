@@ -12,9 +12,11 @@ from switchTextbook import switchTextbook
 from dashscope import Generation
 from openai import OpenAI
 from flask_cors import CORS
+import stat
 
 # Get allowed origins from environment variable or use default
-ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
+# Include multiple localhost ports for development
+ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004,http://localhost:3005').split(',')
 
 class Base(DeclarativeBase):
     pass
@@ -30,8 +32,19 @@ if DATABASE_URL:
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 else:
     # Fallback for local development
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///instance/project.db"
-    os.makedirs('instance', exist_ok=True)
+    # Create instance directory with proper permissions if it doesn't exist
+    instance_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance')
+    if not os.path.exists(instance_path):
+        try:
+            os.makedirs(instance_path, exist_ok=True)
+            # Set directory permissions to 755 (rwxr-xr-x)
+            os.chmod(instance_path, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+        except Exception as e:
+            print(f"Error creating instance directory: {str(e)}")
+    
+    db_path = os.path.join(instance_path, 'project.db')
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+    print(f"Using SQLite database at: {db_path}")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
@@ -321,12 +334,52 @@ def process_dialogue():
         user_message = data.get('text', '').strip()
         style = data.get('style', teaching_style)
         grade = data.get('grade')  # Get grade from request
+        material = data.get('material')  # Get uploaded material content
+        material_name = data.get('materialName')  # Get uploaded material name
         
-        print(f"Received request - Grade: {grade}, Style: {style}, Model: {selected_model}")
+        print(f"Received request - Grade: {grade}, Style: {style}, Model: {selected_model}, Material: {'Yes' if material else 'No'}")
         
+        # Check if we have uploaded material
+        if material:
+            # Check material size to prevent large requests
+            if len(material) > 100 * 1024:  # Limit to 100KB
+                return jsonify({'error': 'Uploaded material is too large. Please upload a smaller file.'}), 413
+                
+            print(f"Processing uploaded material: {material_name}")
+            # Save current conversation if it exists
+            if current_history_id and messages_history:
+                current_history = History.query.get(current_history_id)
+                if current_history:
+                    # Save as completed conversation if it has chat messages
+                    chat_messages = [msg for msg in messages_history if msg.get('role') != 'system']
+                    if chat_messages:
+                        save_conversation(messages_history, is_current=False)
+                    # Delete current session
+                    db.session.delete(current_history)
+                    db.session.commit()
+            
+            # Initialize new conversation with uploaded material
+            print(f"Initializing new conversation with uploaded material")
+            tutor = Tutor(grade=current_textbook, style=style)
+            system_message_content = tutor.load_tutor()
+            
+            # Replace textbook content with uploaded material and add instructions
+            system_message_content = system_message_content.replace(
+                f"Here is the beginning of {current_textbook} textbook:{tutor.load_textbook(current_textbook)}. Here is the end of {current_textbook} textbook.",
+                f"Here is the beginning of uploaded material '{material_name}':\n\n{material}\n\nHere is the end of uploaded material. Your primary task is to help the user understand and learn from this material. Treat this material as the main content for teaching."
+            )
+            
+            system_message = {'role': 'system', 'content': system_message_content}
+            messages_history = [system_message]
+            current_history_id = save_conversation(messages_history, is_current=True)
+            
+            # If there's no user message, return a welcome message
+            if not user_message:
+                welcome_message = f"I've analyzed the material '{material_name}' and I'm ready to help you learn from it. You can ask me questions about the content, request explanations, or discuss any part of the material that interests you."
+                return jsonify({'response': welcome_message})
+            
         # Check if grade has changed
-        grade_changed = grade and grade != current_textbook
-        if grade_changed:
+        elif grade and grade != current_textbook:
             print(f"Grade changed from {current_textbook} to {grade}")
             current_textbook = grade
             
@@ -467,6 +520,12 @@ def reset_conversation():
         data = request.json
         new_style = data.get('style', teaching_style)
         new_grade = data.get('grade', current_textbook)
+        material = data.get('material')  # Get uploaded material content
+        material_name = data.get('materialName')  # Get uploaded material name
+        
+        # Check material size to prevent large requests
+        if material and len(material) > 100 * 1024:  # Limit to 100KB
+            return jsonify({'error': 'Uploaded material is too large. Please upload a smaller file.'}), 413
         
         # Save current session if it has messages
         if current_history_id and messages_history:
@@ -483,11 +542,23 @@ def reset_conversation():
         
         # Update global state
         teaching_style = new_style
-        current_textbook = new_grade
+        if new_grade:
+            current_textbook = new_grade
         
         # Initialize new conversation
         tutor = Tutor(grade=current_textbook, style=new_style)
-        system_message = {'role': 'system', 'content': tutor.load_tutor()}
+        
+        if material and material_name:
+            # Replace textbook content with uploaded material and add instructions
+            system_message_content = tutor.load_tutor()
+            system_message_content = system_message_content.replace(
+                f"Here is the beginning of {current_textbook} textbook:{tutor.load_textbook(current_textbook)}. Here is the end of {current_textbook} textbook.",
+                f"Here is the beginning of uploaded material '{material_name}':\n\n{material}\n\nHere is the end of uploaded material. Your primary task is to help the user understand and learn from this material. Treat this material as the main content for teaching."
+            )
+            system_message = {'role': 'system', 'content': system_message_content}
+        else:
+            system_message = {'role': 'system', 'content': tutor.load_tutor()}
+        
         messages_history = [system_message]
         
         # Create new current session

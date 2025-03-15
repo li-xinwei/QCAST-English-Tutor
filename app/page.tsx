@@ -10,29 +10,59 @@ export default function Home() {
   const [selectedGrade, setSelectedGrade] = useState<string>('3rd-grade');
   const [userQuery, setUserQuery] = useState("");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string>("");
   
   const handleStartChat = () => {
     if (userQuery.trim() || uploadedFile) {
       const params = new URLSearchParams({
         style: selectedStyle,
         model: selectedModel,
-        grade: selectedGrade
       });
+      
+      // Only include grade parameter if no file is uploaded
+      if (!uploadedFile && selectedGrade) {
+        params.append('grade', selectedGrade);
+      }
       
       if (userQuery.trim()) {
         params.append('message', userQuery);
       }
       
       if (uploadedFile) {
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-          const content = event.target?.result as string;
-          params.append('material', content);
-          params.append('materialName', uploadedFile.name);
-          router.push(`/dialogue?${params.toString()}`);
-        };
-        reader.readAsText(uploadedFile);
+        // Check if file is too large (limit to 100KB)
+        if (uploadedFile.size > 100 * 1024) {
+          setFileError("File is too large. Please upload a file smaller than 100KB.");
+          return;
+        }
+        
+        // For text files only
+        if (uploadedFile.type === 'text/plain' || 
+            uploadedFile.name.endsWith('.txt') || 
+            uploadedFile.name.endsWith('.md') || 
+            uploadedFile.name.endsWith('.json')) {
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            const content = event.target?.result as string;
+            
+            // Store file content in sessionStorage instead of URL parameters
+            sessionStorage.setItem('uploadedMaterial', content);
+            sessionStorage.setItem('materialName', uploadedFile.name);
+            
+            // Just pass a flag indicating there's uploaded material
+            params.append('hasUploadedFile', 'true');
+            
+            router.push(`/dialogue?${params.toString()}`);
+          };
+          reader.readAsText(uploadedFile);
+        } else {
+          setFileError("Only plain text files (.txt, .md, .json) are supported.");
+          return;
+        }
       } else {
+        // Clear any previously stored file content
+        sessionStorage.removeItem('uploadedMaterial');
+        sessionStorage.removeItem('materialName');
+        
         router.push(`/dialogue?${params.toString()}`);
       }
     }
@@ -40,8 +70,32 @@ export default function Home() {
   
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setFileError("");
+    
     if (file) {
-      setUploadedFile(file);
+      // Check file type
+      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+        setFileError("PDF files are not supported. Please upload a plain text file.");
+        return;
+      }
+      
+      // Check if file is too large (limit to 100KB)
+      if (file.size > 100 * 1024) {
+        setFileError("File is too large. Please upload a file smaller than 100KB.");
+        return;
+      }
+      
+      // Only accept text files
+      if (file.type === 'text/plain' || 
+          file.name.endsWith('.txt') || 
+          file.name.endsWith('.md') || 
+          file.name.endsWith('.json')) {
+        setUploadedFile(file);
+        // Clear grade selection when a file is uploaded
+        setSelectedGrade('');
+      } else {
+        setFileError("Only plain text files (.txt, .md, .json) are supported.");
+      }
     }
   };
   
@@ -185,13 +239,15 @@ export default function Home() {
               <div className={`p-3 rounded-lg border-2 border-dashed transition-colors ${
                 uploadedFile 
                   ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
-                  : 'border-gray-300 dark:border-gray-700 hover:border-blue-500'
+                  : fileError
+                    ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
+                    : 'border-gray-300 dark:border-gray-700 hover:border-blue-500'
               }`}>
                 <input 
                   type="file" 
                   className="hidden" 
                   onChange={handleFileUpload}
-                  accept=".txt,.json,.md,.pdf"
+                  accept=".txt,.json,.md"
                 />
                 <div className="flex flex-col items-center gap-1">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -205,7 +261,7 @@ export default function Home() {
                     </span>
                   ) : (
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Click to upload a file (.txt, .json, .md, .pdf)
+                      Click to upload a file (.txt, .json, .md)
                     </span>
                   )}
                 </div>
@@ -223,6 +279,11 @@ export default function Home() {
               </button>
             )}
           </div>
+          {fileError && (
+            <div className="mt-2 text-sm text-red-600 dark:text-red-400">
+              {fileError}
+            </div>
+          )}
         </div>
       </main>
       

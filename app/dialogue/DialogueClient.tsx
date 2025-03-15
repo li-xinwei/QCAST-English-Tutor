@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { marked } from 'marked';
-import { sendDialogue, resetConversation, getHistory, getConversation, HistoryEntry, clearHistory } from '../utils/api';
+import { sendDialogue, resetConversation, getHistory, getConversation, HistoryEntry, clearHistory, checkApiConnection, API_BASE_URL } from '../utils/api';
 
 interface Message {
   id: string;
@@ -26,8 +26,36 @@ export default function DialogueClient() {
   const tutorStyle = searchParams.get('style') || 'humorous';
   const aiModel = searchParams.get('model') || 'GPT-4';
   const initialGrade = searchParams.get('grade') || '3rd-grade';
-  const uploadedMaterial = searchParams.get('material') || '';
-  const materialName = searchParams.get('materialName') || '';
+  const hasUploadedFile = searchParams.get('hasUploadedFile') === 'true';
+  
+  // Get uploaded material from sessionStorage if available
+  const [uploadedMaterial, setUploadedMaterial] = useState<string>('');
+  const [materialName, setMaterialName] = useState<string>('');
+  const [apiConnected, setApiConnected] = useState<boolean>(true);
+  const [connectionError, setConnectionError] = useState<string>('');
+  
+  // Check API connection on component mount
+  useEffect(() => {
+    const checkConnection = async () => {
+      const isConnected = await checkApiConnection();
+      setApiConnected(isConnected);
+      if (!isConnected) {
+        setConnectionError(`Unable to connect to the backend server at ${API_BASE_URL}. Please make sure the server is running.`);
+      }
+    };
+    
+    checkConnection();
+  }, []);
+  
+  // Load file content from sessionStorage on component mount
+  useEffect(() => {
+    if (hasUploadedFile) {
+      const storedMaterial = sessionStorage.getItem('uploadedMaterial') || '';
+      const storedMaterialName = sessionStorage.getItem('materialName') || '';
+      setUploadedMaterial(storedMaterial);
+      setMaterialName(storedMaterialName);
+    }
+  }, [hasUploadedFile]);
   
   // Store config in refs to avoid re-renders
   const configRef = useRef({
@@ -38,6 +66,12 @@ export default function DialogueClient() {
     uploadedMaterial,
     materialName
   });
+  
+  // Update configRef when uploadedMaterial changes
+  useEffect(() => {
+    configRef.current.uploadedMaterial = uploadedMaterial;
+    configRef.current.materialName = materialName;
+  }, [uploadedMaterial, materialName]);
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentSessionMessages, setCurrentSessionMessages] = useState<Message[]>([]);
@@ -60,54 +94,61 @@ export default function DialogueClient() {
   // Initialize conversation and load history when component mounts
   useEffect(() => {
     const initializeConversation = async () => {
-      if (initialMessageProcessedRef.current) return;
+      if (initialMessageProcessedRef.current || !apiConnected) return;
       initialMessageProcessedRef.current = true;
       
-      // Reset conversation without messages first
-      await resetConversation(configRef.current.tutorStyle as 'humorous' | 'passionate' | 'creative');
-      
-      // Load chat history first
-      await loadChatHistory();
-      
-      // If there's uploaded material, create it as the first message
-      if (configRef.current.uploadedMaterial) {
-        const userMessage: Message = {
-          id: generateMessageId(),
-          role: 'user',
-          content: `[Uploaded material: ${configRef.current.materialName}]\n\nPlease help me understand and learn from this material:\n\n${configRef.current.uploadedMaterial}`,
-          timestamp: new Date()
-        };
-        setMessages([userMessage]);
-        setCurrentSessionMessages([userMessage]);
-        
-        // Get AI response
-        await simulateResponse(
-          userMessage.content,
-          configRef.current.tutorStyle,
-          configRef.current.aiModel
+      try {
+        // Reset conversation without messages first
+        await resetConversation(
+          configRef.current.tutorStyle as 'humorous' | 'passionate' | 'creative',
+          configRef.current.grade,
+          [],
+          configRef.current.uploadedMaterial,
+          configRef.current.materialName
         );
-      }
-      // If there's an initial message, create it as the first message
-      else if (configRef.current.initialMessage) {
-        const userMessage: Message = {
-          id: generateMessageId(),
-          role: 'user',
-          content: configRef.current.initialMessage,
-          timestamp: new Date()
-        };
-        setMessages([userMessage]);
-        setCurrentSessionMessages([userMessage]);
         
-        // Get AI response
-        await simulateResponse(
-          configRef.current.initialMessage, 
-          configRef.current.tutorStyle, 
-          configRef.current.aiModel
-        );
+        // Load chat history first
+        await loadChatHistory();
+        
+        // If there's an initial message, create it as the first message
+        if (configRef.current.initialMessage) {
+          const userMessage: Message = {
+            id: generateMessageId(),
+            role: 'user',
+            content: configRef.current.initialMessage,
+            timestamp: new Date()
+          };
+          setMessages([userMessage]);
+          setCurrentSessionMessages([userMessage]);
+          
+          // Get AI response
+          await simulateResponse(
+            configRef.current.initialMessage, 
+            configRef.current.tutorStyle, 
+            configRef.current.aiModel
+          );
+        }
+        // If there's uploaded material but no initial message, add a welcome message from the assistant
+        else if (configRef.current.uploadedMaterial && !configRef.current.initialMessage) {
+          // Add a welcome message from the assistant
+          const welcomeMessage: Message = {
+            id: generateMessageId(),
+            role: 'assistant',
+            content: `I've analyzed the material "${configRef.current.materialName}" and I'm ready to help you learn from it. You can ask me questions about the content, request explanations, or discuss any part of the material that interests you.`,
+            timestamp: new Date()
+          };
+          setMessages([welcomeMessage]);
+          setCurrentSessionMessages([welcomeMessage]);
+        }
+      } catch (error) {
+        console.error('Error initializing conversation:', error);
+        setConnectionError(`Error connecting to the backend server: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        setApiConnected(false);
       }
     };
+    
     initializeConversation();
-  }, []); // Empty dependency array since we're using refs
+  }, [apiConnected]); // Add apiConnected as a dependency
   
   // Auto-scroll to bottom of messages
   useEffect(() => {
@@ -159,7 +200,9 @@ export default function DialogueClient() {
         userMessage, 
         model === 'Qwen-2.5' ? 'qwen' : 'gpt',
         style as 'humorous' | 'passionate' | 'creative',
-        configRef.current.grade
+        configRef.current.grade,
+        configRef.current.uploadedMaterial,
+        configRef.current.materialName
       );
       
       const aiMessage: Message = {
@@ -174,14 +217,23 @@ export default function DialogueClient() {
       return response.response;
     } catch (error) {
       console.error('Error getting response:', error);
-      const errorMessage: Message = {
+      let errorMessage = 'Sorry, I encountered an error while processing your message. Please try again.';
+      
+      // Check if error is related to file size
+      if (error instanceof Error && error.message.includes('413')) {
+        errorMessage = 'The uploaded file is too large. Please upload a smaller file (less than 100KB).';
+      } else if (error instanceof Error && error.message.includes('429')) {
+        errorMessage = 'Too many requests. Please wait a moment and try again.';
+      }
+      
+      const errorMsg: Message = {
         id: generateMessageId(),
         role: 'assistant',
-        content: 'Sorry, I encountered an error while processing your message. Please try again.',
+        content: errorMessage,
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, errorMessage]);
-      setCurrentSessionMessages(prev => [...prev, errorMessage]);
+      setMessages(prev => [...prev, errorMsg]);
+      setCurrentSessionMessages(prev => [...prev, errorMsg]);
       return null;
     } finally {
       setIsLoading(false);
@@ -225,14 +277,19 @@ export default function DialogueClient() {
           currentSessionMessages.map(msg => ({
             role: msg.role,
             content: msg.content
-          }))
+          })),
+          configRef.current.uploadedMaterial,
+          configRef.current.materialName
         );
       }
       
       // Start a new conversation
       await resetConversation(
         configRef.current.tutorStyle as 'humorous' | 'passionate' | 'creative',
-        configRef.current.grade
+        configRef.current.grade,
+        [],
+        configRef.current.uploadedMaterial,
+        configRef.current.materialName
       );
       
       // Clear local messages
@@ -307,6 +364,38 @@ export default function DialogueClient() {
   
   return (
     <div className="flex w-full h-screen max-h-screen bg-gray-50 dark:bg-gray-900 font-[family-name:var(--font-geist-sans)]">
+      {/* Connection error message */}
+      {!apiConnected && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md">
+            <h2 className="text-xl font-bold mb-4 text-red-600 dark:text-red-400">Connection Error</h2>
+            <p className="mb-4">{connectionError}</p>
+            <div className="flex justify-between">
+              <button 
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
+                onClick={() => router.push('/')}
+              >
+                Return Home
+              </button>
+              <button 
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                onClick={async () => {
+                  const isConnected = await checkApiConnection();
+                  setApiConnected(isConnected);
+                  if (!isConnected) {
+                    setConnectionError(`Still unable to connect to the backend server at ${API_BASE_URL}. Please make sure the server is running.`);
+                  } else {
+                    initialMessageProcessedRef.current = false;
+                  }
+                }}
+              >
+                Retry Connection
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Sidebar for chat history */}
       <div className={`fixed inset-y-0 left-0 z-40 w-72 bg-white dark:bg-gray-800 shadow-md transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out md:relative md:translate-x-0 flex flex-col`}>
         {/* Fixed header */}
@@ -393,7 +482,13 @@ export default function DialogueClient() {
               {configRef.current.aiModel}
             </span>
             <span className="px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 font-medium">
-              {configRef.current.grade.split('-')[0].charAt(0).toUpperCase() + configRef.current.grade.split('-')[0].slice(1)}
+              {configRef.current.materialName ? (
+                <span title={configRef.current.materialName} className="truncate max-w-[120px] inline-block">
+                  {configRef.current.materialName}
+                </span>
+              ) : (
+                configRef.current.grade.split('-')[0].charAt(0).toUpperCase() + configRef.current.grade.split('-')[0].slice(1)
+              )}
             </span>
           </div>
         </div>
