@@ -4,25 +4,57 @@
     {
       "unit": 1,
       "title": "Adventure Stories",
-      "vocabulary": ["journey", "discover", "explore", "mystery", "solve", "adventure"],
-      "phrases": ["Once upon a time...", "Suddenly...", "In the end..."],
-      "grammar": ["Past simple tense", "Sequence words", "Adjectives and adverbs"],
+      "vocabulary": ["journey", "discover", "explore", "mystery", "solve", "adventure", "clue", "quest", "treasure", "map", "challenge", "hero"],
+      "phrases": ["Once upon a time...", "Suddenly...", "In the end...", "Meanwhile...", "After that...", "To their surprise..."],
+      "grammar": ["Past simple tense", "Sequence words", "Adjectives and adverbs", "Direct speech", "Past continuous"],
       "exercises": [
         "Write a short story",
         "Put events in order",
-        "Describe characters"
+        "Describe characters",
+        "Create dialogue",
+        "Design a story map"
       ]
     },
     {
       "unit": 2,
       "title": "Science and Technology",
-      "vocabulary": ["computer", "experiment", "research", "invention", "scientist", "robot"],
-      "phrases": ["How does it work?", "What will happen if...?", "I predict that..."],
-      "grammar": ["Future with 'will'", "Conditional sentences", "Passive voice"],
+      "vocabulary": ["computer", "experiment", "research", "invention", "scientist", "robot", "data", "hypothesis", "conclusion", "software", "hardware", "digital"],
+      "phrases": ["How does it work?", "What will happen if...?", "I predict that...", "The results show...", "Based on the data...", "My conclusion is..."],
+      "grammar": ["Future with 'will'", "Conditional sentences", "Passive voice", "Cause and effect language"],
       "exercises": [
         "Explain how something works",
         "Make predictions",
-        "Write a science report"
+        "Write a science report",
+        "Design an experiment",
+        "Create a technology timeline"
+      ]
+    },
+    {
+      "unit": 3,
+      "title": "Sports and Games",
+      "vocabulary": ["team", "score", "rules", "strategy", "competition", "practice", "equipment", "referee", "victory", "defeat", "tournament", "skills"],
+      "phrases": ["The rules are...", "How do you play...?", "Let's practice...", "Good game!", "What's the score?", "Who's winning?"],
+      "grammar": ["Imperatives for rules", "Present perfect", "Comparatives and superlatives", "Modal verbs for ability"],
+      "exercises": [
+        "Write game instructions",
+        "Create a sports report",
+        "Design a new game",
+        "Compare different sports",
+        "Plan a tournament"
+      ]
+    },
+    {
+      "unit": 4,
+      "title": "Art and Expression",
+      "vocabulary": ["painting", "sculpture", "music", "dance", "theater", "artist", "performance", "audience", "creativity", "inspiration", "masterpiece", "exhibition"],
+      "phrases": ["This piece shows...", "The artist wanted to...", "I feel that...", "It reminds me of...", "The style is...", "In my opinion..."],
+      "grammar": ["Present perfect continuous", "Expressing opinions", "Descriptive language", "Relative clauses"],
+      "exercises": [
+        "Analyze an artwork",
+        "Write an art review",
+        "Create an artist biography",
+        "Design a gallery layout",
+        "Plan a performance"
       ]
     }
   ]

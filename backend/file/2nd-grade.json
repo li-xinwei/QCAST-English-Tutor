@@ -4,25 +4,57 @@
     {
       "unit": 1,
       "title": "Family and Friends",
-      "vocabulary": ["mother", "father", "sister", "brother", "friend", "teacher"],
-      "phrases": ["This is my...", "Who is she/he?", "I have a..."],
-      "grammar": ["Possessive adjectives: my, your, his, her", "Present simple with have/has"],
+      "vocabulary": ["mother", "father", "sister", "brother", "friend", "teacher", "grandma", "grandpa", "cousin", "aunt", "uncle", "neighbor"],
+      "phrases": ["This is my...", "Who is she/he?", "I have a...", "How many siblings...?", "Do you have...?", "Where does... live?"],
+      "grammar": ["Possessive adjectives: my, your, his, her", "Present simple with have/has", "Yes/No questions", "WH-questions"],
       "exercises": [
         "Draw your family tree",
         "Fill in the blanks with has/have",
-        "Write about your best friend"
+        "Write about your best friend",
+        "Interview a family member",
+        "Create a family photo album description"
       ]
     },
     {
       "unit": 2,
       "title": "Daily Activities",
-      "vocabulary": ["wake up", "eat breakfast", "go to school", "play", "sleep"],
-      "phrases": ["I wake up at...", "What time do you...?", "Every day I..."],
-      "grammar": ["Simple present tense", "Time expressions", "Adverbs of frequency"],
+      "vocabulary": ["wake up", "eat breakfast", "go to school", "play", "sleep", "brush teeth", "get dressed", "do homework", "take a shower", "watch TV"],
+      "phrases": ["I wake up at...", "What time do you...?", "Every day I...", "In the morning...", "At night...", "After school..."],
+      "grammar": ["Simple present tense", "Time expressions", "Adverbs of frequency", "Prepositions of time: in, at, on"],
       "exercises": [
         "Order daily activities",
         "Write the time",
-        "Make your daily schedule"
+        "Make your daily schedule",
+        "Create a weekly planner",
+        "Compare weekday and weekend routines"
+      ]
+    },
+    {
+      "unit": 3,
+      "title": "Food and Meals",
+      "vocabulary": ["breakfast", "lunch", "dinner", "fruit", "vegetable", "meat", "rice", "bread", "milk", "juice", "snack", "hungry"],
+      "phrases": ["I'm hungry/thirsty", "My favorite food is...", "Can I have...?", "Would you like...?", "It tastes..."],
+      "grammar": ["Count/Non-count nouns", "Some/Any", "Like/Don't like", "Would like"],
+      "exercises": [
+        "Create a menu",
+        "Role-play restaurant scenes",
+        "Sort healthy and unhealthy foods",
+        "Write a recipe",
+        "Describe your favorite meal"
+      ]
+    },
+    {
+      "unit": 4,
+      "title": "Weather and Seasons",
+      "vocabulary": ["sunny", "rainy", "cloudy", "snowy", "hot", "cold", "spring", "summer", "fall", "winter", "umbrella", "coat"],
+      "phrases": ["What's the weather like?", "It's going to...", "I need to wear...", "My favorite season is...", "In the summer..."],
+      "grammar": ["Present continuous", "Going to future", "Weather expressions", "Season descriptions"],
+      "exercises": [
+        "Keep a weather diary",
+        "Draw and describe seasons",
+        "Match clothes with weather",
+        "Write about favorite seasonal activities",
+        "Create a weather forecast"
       ]
     }
   ]

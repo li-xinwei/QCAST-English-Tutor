@@ -4,25 +4,57 @@
     {
       "unit": 1,
       "title": "Around the World",
-      "vocabulary": ["country", "city", "language", "culture", "travel", "map"],
-      "phrases": ["Where are you from?", "I live in...", "Can you speak...?"],
-      "grammar": ["Present continuous tense", "Prepositions of place", "Question words: where, which"],
+      "vocabulary": ["country", "city", "language", "culture", "travel", "map", "passport", "tourist", "continent", "ocean", "mountain", "border"],
+      "phrases": ["Where are you from?", "I live in...", "Can you speak...?", "How do you say...?", "What's the capital of...?", "Let's explore..."],
+      "grammar": ["Present continuous tense", "Prepositions of place", "Question words: where, which", "Comparative adjectives"],
       "exercises": [
         "Label countries on a map",
         "Write about your city",
-        "Compare different cultures"
+        "Compare different cultures",
+        "Plan a dream vacation",
+        "Research a country's traditions"
       ]
     },
     {
       "unit": 2,
       "title": "Animals and Habitats",
-      "vocabulary": ["jungle", "desert", "ocean", "lion", "penguin", "whale"],
-      "phrases": ["It lives in...", "What does it eat?", "Can it...?"],
-      "grammar": ["Can/Cannot", "Present simple for facts", "Adjectives"],
+      "vocabulary": ["jungle", "desert", "ocean", "lion", "penguin", "whale", "rainforest", "arctic", "grassland", "predator", "prey", "adaptation"],
+      "phrases": ["It lives in...", "What does it eat?", "Can it...?", "How does it survive?", "Why does it...?", "Its habitat is..."],
+      "grammar": ["Can/Cannot", "Present simple for facts", "Adjectives", "Because/So"],
       "exercises": [
         "Match animals with habitats",
         "Describe an animal",
-        "Write animal facts"
+        "Write animal facts",
+        "Create a food chain diagram",
+        "Research endangered species"
+      ]
+    },
+    {
+      "unit": 3,
+      "title": "Health and Body",
+      "vocabulary": ["exercise", "nutrition", "muscles", "bones", "heart", "lungs", "healthy", "sick", "medicine", "doctor", "hospital", "symptoms"],
+      "phrases": ["I feel...", "You should...", "It's important to...", "What's wrong?", "How often do you...?"],
+      "grammar": ["Should/Shouldn't", "Imperatives", "Frequency adverbs", "Present perfect"],
+      "exercises": [
+        "Create a healthy meal plan",
+        "Write exercise instructions",
+        "Label body parts",
+        "Role-play doctor visits",
+        "Design a fitness routine"
+      ]
+    },
+    {
+      "unit": 4,
+      "title": "Community Helpers",
+      "vocabulary": ["police officer", "firefighter", "nurse", "teacher", "chef", "librarian", "mail carrier", "dentist", "mechanic", "farmer"],
+      "phrases": ["What do you do?", "They help by...", "I want to be...", "Their job is to...", "Where do they work?"],
+      "grammar": ["Present simple for jobs", "Want to/Going to", "Wh-questions about jobs", "Simple past tense"],
+      "exercises": [
+        "Interview a community helper",
+        "Write about dream jobs",
+        "Create job descriptions",
+        "Make a community map",
+        "Role-play different jobs"
       ]
     }
   ]

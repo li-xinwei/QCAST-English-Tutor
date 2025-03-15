@@ -4,25 +4,57 @@
     {
       "unit": 1,
       "title": "Literature and Poetry",
-      "vocabulary": ["metaphor", "simile", "rhythm", "verse", "stanza", "theme"],
-      "phrases": ["The author suggests...", "This symbolizes...", "The main idea is..."],
-      "grammar": ["Perfect tenses", "Literary devices", "Reported speech"],
+      "vocabulary": ["metaphor", "simile", "rhythm", "verse", "stanza", "theme", "alliteration", "personification", "imagery", "rhyme scheme", "mood", "tone"],
+      "phrases": ["The author suggests...", "This symbolizes...", "The main idea is...", "The poet uses...", "This creates an effect of...", "The mood is..."],
+      "grammar": ["Perfect tenses", "Literary devices", "Reported speech", "Figurative language", "Complex sentences"],
       "exercises": [
         "Analyze a poem",
         "Write creative metaphors",
-        "Identify literary devices"
+        "Identify literary devices",
+        "Create a poetry anthology",
+        "Write a literary analysis"
       ]
     },
     {
       "unit": 2,
       "title": "Environment and Conservation",
-      "vocabulary": ["pollution", "recycling", "ecosystem", "climate", "endangered", "sustainable"],
-      "phrases": ["We should...", "If we don't...", "It's important to..."],
-      "grammar": ["Modal verbs", "Second conditional", "Cause and effect"],
+      "vocabulary": ["pollution", "recycling", "ecosystem", "climate", "endangered", "sustainable", "renewable", "biodiversity", "conservation", "habitat", "resources", "impact"],
+      "phrases": ["We should...", "If we don't...", "It's important to...", "The consequences are...", "This affects...", "We can solve this by..."],
+      "grammar": ["Modal verbs", "Second conditional", "Cause and effect", "Passive voice", "Future perfect"],
       "exercises": [
         "Write a persuasive essay",
         "Create an action plan",
-        "Research environmental issues"
+        "Research environmental issues",
+        "Design a conservation project",
+        "Present solutions"
+      ]
+    },
+    {
+      "unit": 3,
+      "title": "Historical Events",
+      "vocabulary": ["civilization", "revolution", "discovery", "invention", "leader", "timeline", "artifact", "document", "evidence", "primary source", "era", "impact"],
+      "phrases": ["During this period...", "This led to...", "As a result...", "Historical records show...", "This changed...", "The significance was..."],
+      "grammar": ["Past perfect", "Sequence words", "Passive voice in history", "Time expressions", "Reported speech"],
+      "exercises": [
+        "Create a timeline",
+        "Write a historical account",
+        "Analyze primary sources",
+        "Compare different eras",
+        "Research historical figures"
+      ]
+    },
+    {
+      "unit": 4,
+      "title": "Space and Astronomy",
+      "vocabulary": ["planet", "galaxy", "universe", "orbit", "constellation", "telescope", "astronaut", "satellite", "comet", "gravity", "atmosphere", "exploration"],
+      "phrases": ["Scientists believe...", "Research indicates...", "The evidence suggests...", "This phenomenon occurs...", "In the future...", "Current theories state..."],
+      "grammar": ["Scientific present", "Future predictions", "Hypothetical situations", "Comparative structures", "Technical vocabulary"],
+      "exercises": [
+        "Write a space research report",
+        "Design a space mission",
+        "Create a planetary guide",
+        "Explain astronomical concepts",
+        "Plan a space presentation"
       ]
     }
   ]

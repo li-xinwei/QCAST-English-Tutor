@@ -4,25 +4,57 @@
     {
       "unit": 1,
       "title": "Alphabet and Basic Sounds",
-      "vocabulary": ["cat", "dog", "hat", "pen", "book"],
-      "phrases": ["This is a...", "I see a...", "What is this?"],
-      "grammar": ["Articles: a, an, the", "Simple present: to be (am, is, are)"],
+      "vocabulary": ["cat", "dog", "hat", "pen", "book", "map", "sun", "bed", "cup", "fish"],
+      "phrases": ["This is a...", "I see a...", "What is this?", "Can you show me...?", "Where is the...?"],
+      "grammar": ["Articles: a, an, the", "Simple present: to be (am, is, are)", "Demonstratives: this, that"],
       "exercises": [
         "Match the letter with its sound",
         "Circle the correct article",
-        "Complete the sentence with 'is' or 'are'"
+        "Complete the sentence with 'is' or 'are'",
+        "Practice writing uppercase and lowercase letters",
+        "Read simple three-letter words"
       ]
     },
     {
       "unit": 2,
       "title": "Colors and Numbers",
-      "vocabulary": ["red", "blue", "green", "one", "two", "three"],
-      "phrases": ["I like...", "What color is it?", "How many?"],
-      "grammar": ["Simple present: like", "Question words: what, how"],
+      "vocabulary": ["red", "blue", "green", "yellow", "purple", "orange", "one", "two", "three", "four", "five", "ten"],
+      "phrases": ["I like...", "What color is it?", "How many?", "Can you count...?", "Show me the color..."],
+      "grammar": ["Simple present: like", "Question words: what, how", "Plural nouns"],
       "exercises": [
         "Color the objects",
         "Count and write the number",
-        "Match colors with objects"
+        "Match colors with objects",
+        "Group objects by color",
+        "Count sets of items"
+      ]
+    },
+    {
+      "unit": 3,
+      "title": "My School Day",
+      "vocabulary": ["teacher", "classroom", "desk", "chair", "pencil", "eraser", "backpack", "lunch", "friend", "playground"],
+      "phrases": ["I need a...", "May I...?", "Thank you", "Please", "Good morning"],
+      "grammar": ["Possessive adjectives: my, your", "Simple requests", "Polite expressions"],
+      "exercises": [
+        "Label classroom objects",
+        "Role-play classroom situations",
+        "Practice polite expressions",
+        "Draw and describe your classroom",
+        "Match school items with their uses"
+      ]
+    },
+    {
+      "unit": 4,
+      "title": "Animals and Pets",
+      "vocabulary": ["bird", "rabbit", "hamster", "fish", "turtle", "puppy", "kitten", "mouse", "horse", "chicken"],
+      "phrases": ["I have a...", "Do you like...?", "It can...", "My favorite animal is...", "The animal is..."],
+      "grammar": ["Can/Cannot", "Simple present for animals", "Basic adjectives: big, small, fast, slow"],
+      "exercises": [
+        "Match animals with their sounds",
+        "Describe your pet or favorite animal",
+        "Sort animals by size",
+        "Draw and label animal parts",
+        "Create an animal fact card"
       ]
     }
   ]

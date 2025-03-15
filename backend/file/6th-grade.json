@@ -4,25 +4,57 @@
     {
       "unit": 1,
       "title": "Media and Communication",
-      "vocabulary": ["journalism", "broadcast", "social media", "interview", "article", "editorial"],
-      "phrases": ["According to...", "Studies show...", "Research indicates..."],
-      "grammar": ["Active vs Passive voice", "Formal vs Informal language", "Complex sentences"],
+      "vocabulary": ["journalism", "broadcast", "social media", "interview", "article", "editorial", "headline", "source", "bias", "fact", "opinion", "audience"],
+      "phrases": ["According to...", "Studies show...", "Research indicates...", "The evidence suggests...", "Critics argue...", "Experts believe..."],
+      "grammar": ["Active vs Passive voice", "Formal vs Informal language", "Complex sentences", "Reported speech", "Subjunctive mood"],
       "exercises": [
         "Write a news article",
         "Conduct an interview",
-        "Analyze media bias"
+        "Analyze media bias",
+        "Create a podcast script",
+        "Design a media campaign"
       ]
     },
     {
       "unit": 2,
       "title": "Global Issues",
-      "vocabulary": ["democracy", "economy", "immigration", "diversity", "equality", "human rights"],
-      "phrases": ["In my opinion...", "Research shows...", "This demonstrates..."],
-      "grammar": ["Third conditional", "Advanced modals", "Academic writing style"],
+      "vocabulary": ["democracy", "economy", "immigration", "diversity", "equality", "human rights", "poverty", "education", "healthcare", "justice", "peace", "development"],
+      "phrases": ["In my opinion...", "Research shows...", "This demonstrates...", "Evidence suggests...", "Statistics indicate...", "Experts argue..."],
+      "grammar": ["Third conditional", "Advanced modals", "Academic writing style", "Complex arguments", "Persuasive language"],
       "exercises": [
         "Write a research paper",
         "Debate global issues",
-        "Present solutions"
+        "Present solutions",
+        "Analyze policy documents",
+        "Create action proposals"
+      ]
+    },
+    {
+      "unit": 3,
+      "title": "Business and Economics",
+      "vocabulary": ["entrepreneur", "investment", "market", "profit", "consumer", "product", "service", "budget", "competition", "advertising", "strategy", "innovation"],
+      "phrases": ["The market shows...", "Consumers prefer...", "Data indicates...", "Research suggests...", "Analysis reveals...", "Trends demonstrate..."],
+      "grammar": ["Business terminology", "Statistical language", "Formal proposals", "Future predictions", "Conditional statements"],
+      "exercises": [
+        "Create a business plan",
+        "Design marketing strategy",
+        "Analyze market trends",
+        "Write financial reports",
+        "Present business proposals"
+      ]
+    },
+    {
+      "unit": 4,
+      "title": "Philosophy and Ethics",
+      "vocabulary": ["morality", "ethics", "values", "responsibility", "justice", "rights", "consequences", "principles", "debate", "argument", "perspective", "reasoning"],
+      "phrases": ["One could argue...", "This raises the question...", "From an ethical standpoint...", "Consider the implications...", "This challenges the idea...", "The dilemma is..."],
+      "grammar": ["Abstract concepts", "Philosophical arguments", "Logical connectors", "Complex reasoning", "Debate structure"],
+      "exercises": [
+        "Write philosophical essays",
+        "Analyze ethical dilemmas",
+        "Debate moral issues",
+        "Create argument maps",
+        "Present ethical solutions"
       ]
     }
   ]
