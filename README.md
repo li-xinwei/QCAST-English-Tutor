@@ -4,12 +4,16 @@ QCAST English Tutor is an AI-powered educational application designed to help En
 
 ![QCAST ESL Logo](/public/qcast-logo.svg)
 
+## Live Application
+
+The application is available at: [https://qcast-english-tutor.vercel.app/](https://qcast-english-tutor.vercel.app/)
+
 ## Features
 
 - **Interactive AI Tutor**: Engage in natural conversations with an AI tutor that adapts to your English proficiency level
-- **Customizable Teaching Styles**: Choose from multiple teaching styles (humorous, encouraging, socratic)
-- **AI Model Selection**: Options to use GPT-4 or other AI models for conversations
-- **Grade-Level Adaptation**: Content tailored to different grade levels for appropriate learning challenges
+- **Customizable Teaching Styles**: Choose from multiple teaching styles (humorous, passionate, creative)
+- **AI Model Selection**: Options to use GPT-4 or Qwen-2.5 AI models for conversations
+- **Grade-Level Adaptation**: Content tailored to different grade levels (1st through 6th) for appropriate learning challenges
 - **Material Upload**: Upload your own learning materials for the AI to teach from or reference
 - **Conversation History**: Save and review past learning sessions
 
@@ -25,7 +29,7 @@ QCAST English Tutor is an AI-powered educational application designed to help En
 - Flask (Python)
 - SQLAlchemy for database management
 - OpenAI API integration (GPT-4)
-- DashScope API integration (alternative AI model)
+- DashScope API integration (Qwen-2.5 model)
 - PostgreSQL/SQLite database options
 
 ## Getting Started
@@ -90,7 +94,7 @@ npm run dev
 
 ## Deployment
 
-The application is configured for easy deployment on platforms like Vercel (frontend) and Railway (backend).
+The application is configured for easy deployment on platforms like Vercel (frontend) and Railway (backend). The current version is deployed at [https://qcast-english-tutor.vercel.app/](https://qcast-english-tutor.vercel.app/).
 
 ## Limitations
 
